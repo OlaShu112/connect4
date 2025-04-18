@@ -1,39 +1,35 @@
 import sys
 import pygame
 
-# Initialize Pygame font system
 pygame.font.init()
 
-# Create a font object once to be used in all functions
+# Font object to be used in all functions
 font = pygame.font.SysFont("Arial", 40)
 
 def display_message(message):
-    """Displays a message on the screen."""
-    screen = pygame.display.get_surface()  # Ensure this uses the existing Pygame surface
-    screen.fill((0, 0, 0))  # Clear the screen before displaying a new message
+    screen = pygame.display.get_surface() 
+    screen.fill((0, 0, 0))  
     
-    # Create a text surface with the message
-    text = font.render(message, True, (255, 255, 255))  # White color for text
+    text = font.render(message, True, (255, 255, 255))  
     
     # Position the text in the center of the screen
     screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, 
                       screen.get_height() // 2 - text.get_height() // 2))
     
-    pygame.display.flip()  # Update the screen with the new content
-    pygame.time.wait(2000)  # Wait for 2 seconds
+    pygame.display.flip()  
+    pygame.time.wait(2000)  
 
 def ask_play_again():
-    """Asks the user if they want to play again."""
     while True:
         screen = pygame.display.get_surface()
-        screen.fill((0, 0, 0))  # Black background
+        screen.fill((0, 0, 0))  
         
         # Render "Play Again?" text
         text = font.render("Play Again? (Y/N)", True, (255, 255, 255))
         screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2,
                            screen.get_height() // 2 - text.get_height() // 2))
         
-        pygame.display.flip()  # Update the screen with the new content
+        pygame.display.flip()  
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -46,9 +42,8 @@ def ask_play_again():
                     return False  # Go back to the main menu
 
 def main_menu():
-    """Displays the main menu."""
     screen = pygame.display.get_surface()
-    screen.fill((0, 0, 0))  # Black background
+    screen.fill((0, 0, 0))  
     
     # Render "Welcome to Connect 4!" text
     text = font.render("Welcome to Connect 4!", True, (255, 255, 255))
@@ -63,7 +58,7 @@ def main_menu():
     screen.blit(quit_text, (screen.get_width() // 2 - quit_text.get_width() // 2, 
                             screen.get_height() // 2 - quit_text.get_height() // 2 + 100))
 
-    pygame.display.flip()  # Update the screen
+    pygame.display.flip()  
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -71,15 +66,14 @@ def main_menu():
             sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
-                return True  # Start the game
+                return True  
             elif event.key == pygame.K_q:
                 pygame.quit()
                 sys.exit()
 
 def difficulty_menu():
-    """Displays the difficulty menu."""
     screen = pygame.display.get_surface()
-    screen.fill((0, 0, 0))  # Black background
+    screen.fill((0, 0, 0))  
     
     # Render "Select Difficulty" text
     text = font.render("Select Difficulty", True, (255, 255, 255))
@@ -97,7 +91,7 @@ def difficulty_menu():
     screen.blit(hard_text, (screen.get_width() // 2 - hard_text.get_width() // 2, 
                             screen.get_height() // 2 - hard_text.get_height() // 2 + 150))
 
-    pygame.display.flip()  # Update the screen
+    pygame.display.flip() 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

@@ -1,12 +1,9 @@
-# music_player.py
-
 import pygame
 import os
 
 # Initialize mixer
 pygame.mixer.init()
 
-# Fix path to go two levels up to reach root -> assets
 base_dir = os.path.dirname(os.path.abspath(__file__))
 assets_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "assets"))
 
@@ -45,7 +42,6 @@ def previous_track():
     current_track_index = (current_track_index - 1) % len(music_files)
     play_music()
 
-# Do NOT modify this part – as per your request
 if __name__ == "__main__":
     while True:
         print("\nCommands: [P]lay, [S]top, [N]ext, [B]ack, [Q]uit")

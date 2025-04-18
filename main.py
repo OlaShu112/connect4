@@ -12,22 +12,17 @@ from connect4.constants import screen, WIDTH, HEIGHT, YELLOW, RED, BLACK, WHITE
 from connect4.message import display_message, ask_play_again
 from connect4.player_data import save_player_score, display_scoreboard
 
-# Initialize Pygame
 pygame.init()
 
-# Set up display
 pygame.display.set_caption("Connect 4")
 
-# Font for text
 font = pygame.font.SysFont("Arial", 40)
 
-# Initial game state setup (assuming board and turn are initialized elsewhere)
-board = [[0 for _ in range(7)] for _ in range(6)]  # Example empty board
-turn = 1  # Example turn (1 or 2, depending on the player)
+board = [[0 for _ in range(7)] for _ in range(6)]  
+turn = 1 
 
 # Register Player Function
 def register_player():
-    """Prompts the player to register their name."""
     while True:
         screen.fill(BLACK)
         text = font.render("Do you want to register your name? (Y/N)", True, WHITE)
@@ -47,7 +42,6 @@ def register_player():
                     return None
 
 def input_player_name():
-    """Prompts the player to input their name."""
     name = ""
     input_active = True
 
@@ -79,7 +73,6 @@ def input_player_name():
 
 # Main Menu Function
 def main_menu():
-    """Displays the main menu for game mode selection."""
     while True:
         screen.fill(BLACK)
 
@@ -109,7 +102,6 @@ def main_menu():
 
 # Difficulty Menu Function
 def difficulty_menu():
-    """Displays the difficulty menu for AI selection."""
     while True:
         screen.fill(BLACK)
 
@@ -144,14 +136,11 @@ def difficulty_menu():
 
 # Main Execution Block
 if __name__ == "__main__":
-    # Register the player (if chosen)
     player_name = register_player()
 
-    # Print player name (if registered)
     if player_name:
         print(f"Player registered with name: {player_name}")
     
-    # Game mode selection
     game_mode = main_menu()  # Get selected game mode
 
     # Set AI agents based on selected mode
@@ -164,7 +153,6 @@ if __name__ == "__main__":
     elif game_mode == 'player_vs_ai':
         player1_agent = None  # Human player
         player2_agent = difficulty_menu()  # AI opponent
-
 
     player1_name = "Player 1"
     player2_name = "Player 2" if game_mode == 'human' else "AI"

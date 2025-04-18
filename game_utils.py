@@ -7,24 +7,21 @@ COLUMN_COUNT = 7
 ROW_COUNT = 6
 
 def create_board():
-    """Creates a new empty board."""
     return [[0] * COLUMN_COUNT for _ in range(ROW_COUNT)]
 
 def drop_piece(board, col, player):
-    """Drops a piece into the specified column for the current player."""
-    col = int(float(col))  # Handles both '5' and '5.0'
+    col = int(float(col))  
     if col < 0 or col >= COLUMN_COUNT:
-        return -1  # Invalid column index
+        return -1 
 
-    for row in range(ROW_COUNT - 1, -1, -1):  # Start from the bottom of the board
-        if board[row][col] == 0:  # If the space is empty
-            board[row][col] = player  # Drop the piece
-            return row  # Return the row where the piece was placed
-    return -1  # If the column is full
+    for row in range(ROW_COUNT - 1, -1, -1): 
+        if board[row][col] == 0: 
+            board[row][col] = player  
+            return row  
+    return -1  
 
 
 def valid_move(board, col):
-    """Checks if the move is valid in the given column."""
     col = int(float(col))
     return 0 <= col < COLUMN_COUNT and board[0][col] == 0
 
@@ -36,7 +33,6 @@ def make_move(board, col, player):
     return None
 
 def check_win(board, piece):
-    """Checks for a win condition for the specified player (piece)."""
     # Horizontal check
     for r in range(ROW_COUNT):
         for c in range(COLUMN_COUNT - 3):
@@ -80,7 +76,7 @@ def ai_move(board, agent, turn, label, screen):
         row = drop_piece(board, block_col, turn)
         if row != -1:
             if check_win(board, turn):
-                draw_board(board, turn, screen)  # Make sure this is imported correctly from another module
+                draw_board(board, turn, screen)  
                 display_message(f"{label} wins!")
                 return True
             elif board_is_full(board):
@@ -115,15 +111,11 @@ def ai_move(board, agent, turn, label, screen):
     return False
 
 def block_player_move(board, player):
-    """
-    Check if the opponent can win in the next move and return the column to block it.
-    If no blocking move is found, return -1.
-    """
-    for col in range(len(board[0])):  # Iterate through all columns
-        if valid_move(board, col):  # Check if the column is a valid move
-            # Simulate the move for the opponent (make a copy of the board)
+    for col in range(len(board[0])): 
+        if valid_move(board, col):  
+           
             temp_board = [row.copy() for row in board]
-            row = drop_piece(temp_board, col, player)  # Drop the player's piece in the simulated board
+            row = drop_piece(temp_board, col, player)  
             if check_win(temp_board, player):  # Check if the opponent wins
                 return col  # Block the winning move by returning the column
     return -1

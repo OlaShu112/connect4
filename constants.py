@@ -1,6 +1,5 @@
 import pygame
 
-# Define constants
 SQUARE_SIZE = 100  # Size of each square in the grid
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -14,7 +13,6 @@ YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
 BLUE = (70, 130, 200)
 
-# Initialize the screen here to avoid circular imports
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 

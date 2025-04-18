@@ -4,13 +4,14 @@ from connect4.game_utils import COLUMN_COUNT, valid_move, make_move, check_win
 # ================================
 # MiniMax AI Agent (With Alpha-Beta Pruning)
 # ================================
+
 def minimax_agent(board, player):
-    # This function will return the best column for the minimax agent
     best_col = None
     best_score = -float('inf')
     for col in range(COLUMN_COUNT):
         if valid_move(board, col):
-            temp_board = [row[:] for row in board]  # Copy the board
+            temp_board = [row[:] for row in board]  
+            
             row = make_move(temp_board, col, player)
             score = minimax(temp_board, 3, -float('inf'), float('inf'), False, player)
             if score > best_score:
@@ -26,7 +27,7 @@ def minimax(board, depth, alpha, beta, maximizing_player, player):
         max_eval = -float('inf')
         for col in range(COLUMN_COUNT):
             if valid_move(board, col):
-                temp_board = [row[:] for row in board]  # Copy the board
+                temp_board = [row[:] for row in board]  
                 row = make_move(temp_board, col, player)
                 eval = minimax(temp_board, depth - 1, alpha, beta, False, player)
                 max_eval = max(max_eval, eval)
@@ -38,7 +39,7 @@ def minimax(board, depth, alpha, beta, maximizing_player, player):
         min_eval = float('inf')
         for col in range(COLUMN_COUNT):
             if valid_move(board, col):
-                temp_board = [row[:] for row in board]  # Copy the board
+                temp_board = [row[:] for row in board]  
                 row = make_move(temp_board, col, 3 - player)
                 eval = minimax(temp_board, depth - 1, alpha, beta, True, player)
                 min_eval = min(min_eval, eval)
@@ -48,7 +49,6 @@ def minimax(board, depth, alpha, beta, maximizing_player, player):
         return min_eval
 
 def evaluate_board(board, player):
-    """Evaluates the board, taking into account the potential for creating 2- or 3-piece streaks"""
     score = 0
     # Horizontal check
     for r in range(len(board)):

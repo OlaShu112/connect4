@@ -1,15 +1,12 @@
 import random
 import pandas as pd
 import numpy as np
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from connect4.game_utils import COLUMN_COUNT, valid_move, make_move, check_win, block_player_move
 from connect4.graphics import draw_board
-
 
 # ================================
 # Machine Learning Agent (Placeholder)
@@ -28,43 +25,32 @@ features = [line.split(':')[0].strip() for line in lines if ':' in line][:42]
 # Debug print to confirm correct number of features
 assert len(features) == 42, f"Expected 42 feature names, but found {len(features)}"
 
-# Set the feature columns plus the 'winner' column
 data.columns = features + ['winner']
 
-# Drop rows where 'winner' is missing or not a string
 data = data[data['winner'].apply(lambda x: isinstance(x, str))]
 
-# Separate features and target
 X = data.drop('winner', axis=1)
 y = data['winner']
 
-# Encode the target labels (winner) into numbers
 label_encoder = LabelEncoder()
 y = label_encoder.fit_transform(y)
 
-# Function to convert board positions ('pos_01', 'pos_02', ...) into numeric values
 def convert_board_positions_to_numeric(df):
     for column in df.columns:
-        if df[column].dtype == 'object':  # Check if the column is categorical
-            # Apply conversion only to valid strings with '_'
+        if df[column].dtype == 'object':  
             df[column] = df[column].apply(
                 lambda x: int(x.split('_')[1]) if isinstance(x, str) and '_' in x else x
             )
     return df
 
-# Convert the board positions in X into numeric values
 X = convert_board_positions_to_numeric(X)
 
-# Ensure that all columns in X are numeric after conversion
 for column in X.columns:
-    # If a column is still not numeric, attempt to convert it
     if X[column].dtype == 'object':
         X[column] = pd.to_numeric(X[column], errors='coerce')
 
-# Drop any rows with NaN values that couldn't be converted
 X = X.dropna()
 
-# Ensure that all columns in X are now numeric
 assert all(np.issubdtype(X[col], np.number) for col in X.columns), "Not all columns are numeric."
 
 # Train-test split
@@ -87,19 +73,15 @@ def predict_move(board):
 
     return predicted_label  # Placeholder: not an actual move column yet
 
-# ML agent function to be used by the game
+
 def ml_agent(board, player):
     try:
-        # Map player to the correct label (e.g., 'O' or 'X')
         player_label_map = {1: 'O', 2: 'X'}  # Example mapping, adapt as needed
         player_label = player_label_map[player]
         
-        # Ensure the label used during prediction exists in the label encoder
         if player_label not in label_encoder.classes_:
-            # If the label is not in the encoder, we add it manually
             label_encoder.fit(np.append(label_encoder.classes_, player_label))
         
-        # Transform the player label for prediction
         class_index = label_encoder.transform([player_label])[0]
         
         prediction = predict_move(board)
