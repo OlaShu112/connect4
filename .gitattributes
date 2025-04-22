@@ -1,1 +1,1 @@
-connect4_dataset/connect-4.data filter=lfs diff=lfs merge=lfs -text
+ connect4_dataset/connect-4.data.csv filter=lfs diff=lfs merge=lfs -text
