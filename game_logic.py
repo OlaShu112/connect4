@@ -1,25 +1,31 @@
 import pygame
 import time
 import sys
-from connect4.game_utils import drop_piece, valid_move, check_win, block_player_move, ai_move, switch_turn
+from connect4.game_utils import (
+    drop_piece, valid_move, check_win, ai_move,
+    switch_turn, create_board, board_is_full, get_column_from_mouse
+)
 from connect4.music_player import play_music, stop_music, next_track, previous_track
-from connect4.message import display_message, ask_play_again, main_menu, difficulty_menu
-from connect4.agents.random_agent import random_agent
-from connect4.agents.minimax_agent import minimax_agent
-from connect4.agents.ml_agent import ml_agent
+from connect4.agent_utils.random_agent import random_agent
+from connect4.agent_utils.minimax_agent import minimax_agent
+from connect4.agent_utils.ml_agent import train_model
 from connect4.constants import BLACK, WHITE, WIDTH, HEIGHT, SQUARE_SIZE, ROW_COUNT, COLUMN_COUNT, RED, YELLOW, BLUE
-from connect4.game_utils import create_board, board_is_full, get_column_from_mouse
 from connect4.graphics import draw_board
 from connect4.player_data import save_player_score
-from connect4.player_data import register_player
+from connect4.game_help import block_player_move  # Correct import here
 
 TURN_TIME_LIMIT = 10  # seconds
 
-def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play_again, main_menu, difficulty_menu, screen, player1_name, player2_name):
+def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play_again,
+              main_menu, difficulty_menu, screen, player1_name, player2_name, model=None):
+    """
+    Main game loop for Connect 4.
+    Handles different game modes, time limit per turn, player moves, AI moves, and music control.
+    """
     while True:
         board = create_board()
         running = True
-        turn = 1
+        turn = 1  # Player 1 starts
         draw_board(board, turn, screen)
 
         turn_start_time = time.time()  # Start of each turn
@@ -48,7 +54,15 @@ def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play
                         next_track()
                     elif event.key == pygame.K_LEFT:
                         previous_track()
+                    elif event.key == pygame.K_4:
+                        print("Training ML agent manually...")
+                        try:
+                            model = train_model("connect4_dataset/connect-4.data", "connect4_dataset/connect-4.names")
+                            print("Manual training complete.")
+                        except Exception as e:
+                            print(f"Error training ML agent: {e}")
 
+                # Handle mouse click for human player
                 if game_mode == 'human' and event.type == pygame.MOUSEBUTTONDOWN:
                     col = get_column_from_mouse(event)
                     if valid_move(board, col):
@@ -71,6 +85,7 @@ def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play
                                 turn_start_time = time.time()
                                 draw_board(board, turn, screen)
 
+                # Handle moves in Player vs AI mode
                 elif game_mode == 'player_vs_ai' and turn == 1:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         col = get_column_from_mouse(event)
@@ -84,7 +99,7 @@ def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play
                                     running = False
                                 elif board_is_full(board):
                                     draw_board(board, turn, screen)
-                                    display_message("It's a tie!")
+                                    display_message("It's a draw!")
                                     save_player_score(player1_name, 0.5)
                                     save_player_score(player2_name, 0.5)
                                     running = False
@@ -96,13 +111,17 @@ def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play
 
                 elif game_mode == 'player_vs_ai' and turn == 2:
                     pygame.time.delay(1000)
-                    if ai_move(board, player2_agent, turn, player2_name, screen):
-                        save_player_score(player2_name, 1)
-                        running = False
+                    if ai_move is not None:
+                        if ai_move(board, player2_agent, turn, player2_name, screen):
+                            save_player_score(player2_name, 1)
+                            running = False
+                        else:
+                            turn = 1
+                            turn_start_time = time.time()
                     else:
-                        turn = 1
-                        turn_start_time = time.time()
+                        print("AI move function is not available.")
 
+            # Handle AI vs AI mode
             if game_mode == 'ai_vs_ai' and running:
                 pygame.time.delay(2000)
                 agent = player1_agent if turn == 1 else player2_agent
@@ -124,27 +143,10 @@ def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play
                         from connect4.agents.ml_agent import ml_agent
                         player1_agent = minimax_agent
                         player2_agent = ml_agent
-
-                    player1_agent = difficulty_menu()
+                    elif game_mode == 'player_vs_ai':
+                        player1_agent = difficulty_menu()
+                        player2_agent = minimax_agent
+                    else:
+                        player1_agent = difficulty_menu()
+                        player2_agent = difficulty_menu()
                     break
-
-if __name__ == "__main__":
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Connect 4")
-
-    game_mode = main_menu()
-    player1_agent = difficulty_menu()
-    player2_agent = random_agent if game_mode == 'ai_vs_ai' else minimax_agent
-
-    if game_mode == 'ai_vs_ai':
-        player1_name = "AI 1"
-        player2_name = "AI 2"
-    elif game_mode == 'player_vs_ai':
-        player1_name = register_player(1)
-        player2_name = "AI"
-    else:
-        player1_name = register_player(1)
-        player2_name = register_player(2)
-
-    game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play_again, main_menu, difficulty_menu, screen, player1_name, player2_name)

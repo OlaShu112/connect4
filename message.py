@@ -41,66 +41,36 @@ def ask_play_again():
                 if event.key == pygame.K_n:
                     return False  # Go back to the main menu
 
-def main_menu():
-    screen = pygame.display.get_surface()
-    screen.fill((0, 0, 0))  
-    
-    # Render "Welcome to Connect 4!" text
-    text = font.render("Welcome to Connect 4!", True, (255, 255, 255))
-    screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, 
-                       screen.get_height() // 2 - text.get_height() // 2 - 50))
-    
-    # Render menu options
-    menu_text = font.render("Press 'P' to Play", True, (255, 255, 255))
-    screen.blit(menu_text, (screen.get_width() // 2 - menu_text.get_width() // 2, 
-                            screen.get_height() // 2 - menu_text.get_height() // 2 + 50))
-    quit_text = font.render("Press 'Q' to Quit", True, (255, 255, 255))
-    screen.blit(quit_text, (screen.get_width() // 2 - quit_text.get_width() // 2, 
-                            screen.get_height() // 2 - quit_text.get_height() // 2 + 100))
+def ai_move_wrapper(board, agent, turn, label, screen):
+    # Import the necessary functions *inside* the function to prevent circular import
+    from connect4.game_utils import (
+        block_player_move, drop_piece, check_win,
+        draw_board, board_is_full, switch_turn,
+        easy_ai_move, medium_ai_move, hard_ai_move, ai_move
+    )
 
-    pygame.display.flip()  
+    opponent = 1 if turn == 2 else 2
+    block_col = block_player_move(board, opponent)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:
-                return True  
-            elif event.key == pygame.K_q:
-                pygame.quit()
-                sys.exit()
+    if block_col != -1:
+        col = block_col
+    else:
+        if agent.__name__ == "ml_agent":
+            col = agent(board)
+        else:
+            col = agent(board, turn)
 
-def difficulty_menu():
-    screen = pygame.display.get_surface()
-    screen.fill((0, 0, 0))  
-    
-    # Render "Select Difficulty" text
-    text = font.render("Select Difficulty", True, (255, 255, 255))
-    screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, 
-                       screen.get_height() // 2 - text.get_height() // 2 - 50))
-    
-    # Render difficulty options
-    easy_text = font.render("Press '1' for Easy", True, (255, 255, 255))
-    screen.blit(easy_text, (screen.get_width() // 2 - easy_text.get_width() // 2, 
-                            screen.get_height() // 2 - easy_text.get_height() // 2 + 50))
-    medium_text = font.render("Press '2' for Medium", True, (255, 255, 255))
-    screen.blit(medium_text, (screen.get_width() // 2 - medium_text.get_width() // 2, 
-                            screen.get_height() // 2 - medium_text.get_height() // 2 + 100))
-    hard_text = font.render("Press '3' for Hard", True, (255, 255, 255))
-    screen.blit(hard_text, (screen.get_width() // 2 - hard_text.get_width() // 2, 
-                            screen.get_height() // 2 - hard_text.get_height() // 2 + 150))
+    row = drop_piece(board, col, turn)  # ← fixed bug: used block_col before, now using `col`
 
-    pygame.display.flip() 
+    if row != -1:
+        if check_win(board, turn):
+            draw_board(board, turn, screen)  
+            display_message(f"{label} wins!")
+            return True
+        elif board_is_full(board):
+            draw_board(board, turn, screen)
+            display_message("It's a draw!")
+            return True
+        draw_board(board, switch_turn(turn), screen)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_1:
-                return 'Easy'  # Easy difficulty selected
-            elif event.key == pygame.K_2:
-                return 'Medium'  # Medium difficulty selected
-            elif event.key == pygame.K_3:
-                return 'Hard'  # Hard difficulty selected
+    return False
