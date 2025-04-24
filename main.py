@@ -1,7 +1,6 @@
 import pygame
 import sys
 import os
-import connect4
 
 # Music and agents
 from connect4.music_player import play_music, stop_music, next_track, previous_track

@@ -14,6 +14,7 @@ from connect4.graphics import draw_board
 from connect4.player_data import save_player_score
 from connect4.game_help import block_player_move  # Correct import here
 
+
 TURN_TIME_LIMIT = 10  # seconds
 
 def game_loop(game_mode, player1_agent, player2_agent, display_message, ask_play_again,
